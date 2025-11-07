@@ -3,27 +3,22 @@ import 'package:go_router/go_router.dart';
 import 'package:sistema_academico/screens/admin/admin_screen.dart';
 import 'package:sistema_academico/services/api_service.dart';
 
-
-
-class LoginScreen extends StatelessWidget {
-  LoginScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
   static const String name = 'login_screen';
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   final ApiService apiService = ApiService();
+  bool _isLoading = false;
+
   @override
   Widget build(BuildContext context) {
-    
-  void login(String username, String password) async {
-    final exito = await apiService.login(username, password);
-    if (exito){
-      final rol = await apiService.getRol();
-      if (rol == 'ADMIN') {
-        // ignore: use_build_context_synchronously
-        context.goNamed(AdminScreen.name);
-      }
-    }
-  }
-  final  emailController = TextEditingController(); 
-  final  passwordController = TextEditingController();
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -52,7 +47,7 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 40),
-          
+
                   // Campo de correo
                   Container(
                     decoration: BoxDecoration(
@@ -63,8 +58,10 @@ class LoginScreen extends StatelessWidget {
                       controller: emailController,
                       style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 18,
+                        ),
                         border: InputBorder.none,
                         hintText: 'Correo electrónico',
                         hintStyle: TextStyle(color: Colors.white70),
@@ -72,7 +69,7 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-          
+
                   // Campo de contraseña
                   Container(
                     decoration: BoxDecoration(
@@ -84,8 +81,10 @@ class LoginScreen extends StatelessWidget {
                       obscureText: true,
                       style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 18,
+                        ),
                         border: InputBorder.none,
                         hintText: 'Contraseña',
                         hintStyle: TextStyle(color: Colors.white70),
@@ -93,13 +92,28 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 40),
-          
+
                   // Botón de iniciar sesión
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () async {
-                        login(emailController.text, passwordController.text);
+                        setState(() => _isLoading = true);
+                        await apiService
+                            .login(
+                              emailController.text,
+                              passwordController.text,
+                            )
+                            .then((exito) async {
+                              if (exito) {
+                                final rol = await apiService.getRol();
+                                if (rol == 'ADMIN') {
+                                  // ignore: use_build_context_synchronously
+                                  context.goNamed(AdminScreen.name);
+                                }
+                              }
+                            });
+                        setState(() => _isLoading = false);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1AF971),
@@ -109,13 +123,22 @@ class LoginScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(40),
                         ),
                       ),
-                      child: Text(
-                        'Iniciar Sesión',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
+                      child: _isLoading
+                          ? SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 3,
+                                color: Colors.black,
+                              ),
+                            )
+                          : const Text(
+                              'Iniciar Sesión',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
                     ),
                   ),
                 ],
