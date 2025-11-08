@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:sistema_academico/models/info_programa.dart';
 
 class ApiService {
   final Dio dio;
@@ -37,5 +38,25 @@ class ApiService {
 
   Future<String?> getRol() async {
     return _storage.read(key: 'rol');
+  }
+  
+  Future<List<InfoPrograma>> getProgramas() async{
+    try {
+      final token = await _storage.read(key: 'token');
+      dio.options.headers['Authorization'] = 'Bearer $token';
+      final response = await dio.get('/admin/programas');
+
+      List<InfoPrograma> programas = [];
+      for (Map<String, dynamic> programa in response.data){
+        programas.add(
+          InfoPrograma.fromJson(programa)
+        );
+      }
+
+
+      return programas;
+    } catch (e){
+      return [];
+    }
   }
 }
