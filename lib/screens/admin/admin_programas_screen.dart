@@ -82,6 +82,7 @@ class _CustomListTile extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         border: Border.all(
+          // ignore: deprecated_member_use
           color: colors.primary.withOpacity(0.3),
           width: 1.5,
         ),
@@ -98,7 +99,7 @@ class _CustomListTile extends StatelessWidget {
         ),
         subtitle: Text(menuItem.description),
         onTap: () {
-          context.push('/admin');
+          context.push('/admin/programa', extra: menuItem);
         },
       ),
     );

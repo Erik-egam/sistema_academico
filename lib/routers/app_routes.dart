@@ -1,4 +1,6 @@
 import 'package:go_router/go_router.dart';
+import 'package:sistema_academico/models/info_programa.dart';
+import 'package:sistema_academico/screens/admin/admin_programa_screen.dart';
 import 'package:sistema_academico/screens/admin/admin_programas_screen.dart';
 import 'package:sistema_academico/screens/admin/admin_screen.dart';
 import '../screens/login_screen.dart';
@@ -17,9 +19,17 @@ final router = GoRouter(
       builder: (context, state) => AdminScreen(),
     ),
     GoRoute(
-      path: '/admin/profesores',
+      path: '/admin/programas',
       name: AdminProgramasScreen.name,
       builder: (context, state) => AdminProgramasScreen(),
+    ),
+    GoRoute(
+      path: '/admin/programa',
+      name: AdminProgramaScreen.name,
+      builder: (context, state) {
+        final infoPrograma = state.extra as InfoPrograma;
+        return AdminProgramaScreen(programa: infoPrograma,);
+      },
     ),
   ],
 );

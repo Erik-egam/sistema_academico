@@ -40,7 +40,7 @@ class ApiService {
     return _storage.read(key: 'rol');
   }
   
-  Future<List<InfoPrograma>> getProgramas() async{
+  Future<List<InfoPrograma>> getProgramas() async {
     try {
       final token = await _storage.read(key: 'token');
       dio.options.headers['Authorization'] = 'Bearer $token';
