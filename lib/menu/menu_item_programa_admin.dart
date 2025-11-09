@@ -14,8 +14,8 @@ class MenuItemProgramaAdmin {
 }
 
 const appMenuItemsProgramasAdmin = <MenuItemProgramaAdmin>[
-  MenuItemProgramaAdmin(name: 'Profesores', subTitle: 'Administrar profesores', icon: Icons.workspace_premium, link: 'admin/profesores'),
-  MenuItemProgramaAdmin(name: 'Estudiantes', subTitle: 'Administrar estudiantes', icon: Icons.workspace_premium, link: 'admin/estudiantes'),
-  MenuItemProgramaAdmin(name: 'Asignaturas', subTitle: 'Administrar asignaturas', icon: Icons.workspace_premium, link: 'admin/estudiantes'),
+  MenuItemProgramaAdmin(name: 'Profesores', subTitle: 'Administrar profesores', icon: Icons.workspace_premium, link: '/admin/profesores/'),
+  MenuItemProgramaAdmin(name: 'Estudiantes', subTitle: 'Administrar estudiantes', icon: Icons.workspace_premium, link: '/admin/estudiantes/'),
+  MenuItemProgramaAdmin(name: 'Asignaturas', subTitle: 'Administrar asignaturas', icon: Icons.workspace_premium, link: '/admin/estudiantes/'),
 
 ];

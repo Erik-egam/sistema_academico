@@ -14,16 +14,16 @@ class AdminProgramaScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(programa.name),
       ),
-      body: AdminProgramaView()
+      body: AdminProgramaView(idPrograma: programa.id,)
       );
   }
 }
 
 class AdminProgramaView extends StatelessWidget {
   const AdminProgramaView({
-    super.key,
+    super.key, required this.idPrograma,
   });
-
+  final int idPrograma;
   @override
   Widget build(BuildContext context) {
     appMenuItemsProgramasAdmin;
@@ -31,15 +31,15 @@ class AdminProgramaView extends StatelessWidget {
       itemCount: appMenuItemsProgramasAdmin.length,
       itemBuilder: (context, index) {
         final menuItem = appMenuItemsProgramasAdmin[index];
-        return _CustomListTile(menuItem: menuItem);
+        return _CustomListTile(menuItem: menuItem, idPrograma: idPrograma,);
       },
     );
   }
 }
 
 class _CustomListTile extends StatelessWidget {
-  const _CustomListTile({required this.menuItem});
-
+  const _CustomListTile({required this.menuItem, required this.idPrograma});
+  final int idPrograma;
   final MenuItemProgramaAdmin menuItem;
   @override
   Widget build(BuildContext context) {
@@ -50,7 +50,7 @@ class _CustomListTile extends StatelessWidget {
       title: Text(menuItem.name),
       subtitle: Text(menuItem.subTitle),
       onTap: () {
-        context.push(menuItem.link);
+        context.push('${menuItem.link}$idPrograma');
       },
     );
   }

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:sistema_academico/models/info_programa.dart';
+import 'package:sistema_academico/models/info_usuario.dart';
 
 class ApiService {
   final Dio dio;
@@ -57,6 +58,45 @@ class ApiService {
       return programas;
     } catch (e){
       return [];
+    }
+  }
+  Future<List<InfoUsuario>> getProfesoresPrograma(int idPrograma) async {
+    try {
+      final token = await _storage.read(key: 'token');
+      dio.options.headers['Authorization'] = 'Bearer $token';
+      final response = await dio.get('/admin/programa/profesores/$idPrograma');
+
+      List<InfoUsuario> profesores = [];
+      for (Map<String, dynamic> profesor in response.data){
+        profesores.add(
+          InfoUsuario.fromJson(profesor)
+        );
+      }
+
+
+      return profesores;
+    } catch (e){
+      return [];
+    }
+  }
+  Future<bool> eliminarUsuario(int idUsuario) async {
+    try {
+      final token = await _storage.read(key: 'token');
+      dio.options.headers['Authorization'] = 'Bearer $token';
+      await dio.put('/admin/eliminar/usuario/$idUsuario');
+      return true;
+    } catch (_){
+      return false;
+    }
+  }
+  Future<bool> activarUsuario(int idUsuario) async {
+    try {
+      final token = await _storage.read(key: 'token');
+      dio.options.headers['Authorization'] = 'Bearer $token';
+      await dio.put('/admin/activar/usuario/$idUsuario');
+      return true;
+    } catch (_){
+      return false;
     }
   }
 }
