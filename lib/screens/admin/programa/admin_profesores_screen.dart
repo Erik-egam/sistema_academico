@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:sistema_academico/models/info_programa.dart';
 import 'package:sistema_academico/models/info_usuario.dart';
 import 'package:sistema_academico/services/api_service.dart';
 
@@ -14,6 +14,16 @@ class AdminProfesoresScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text("Profesores")),
       body: AdminProfesoresView(idPrograma: idPrograma),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Aquí abres el formulario de creación (o un diálogo, o una nueva pantalla)
+          showDialog(
+            context: context,
+            builder: (context) => _NuevoProfesorDialog(idPrograma: idPrograma,),
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
@@ -68,7 +78,7 @@ class _AdminProgramasViewState extends State<AdminProfesoresView> {
           final profesor = profesores[index];
           return _CustomListTile(
             menuItem: profesor,
-            onStatusChanged: _loadProgramas, // <- le pasamos la función
+            onStatusChanged: _loadProgramas,
           );
         },
       ),
@@ -98,15 +108,21 @@ class _CustomListTileState extends State<_CustomListTile> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        // ignore: deprecated_member_use
-        border: Border.all(color: widget.menuItem.activo ? colors.primary.withOpacity(0.3) : Colors.red.withOpacity(0.3), width: 1.5),
+        border: Border.all(
+          color: widget.menuItem.activo
+              // ignore: deprecated_member_use
+              ? colors.primary.withOpacity(0.3)
+              // ignore: deprecated_member_use
+              : Colors.red.withOpacity(0.3),
+          width: 1.5,
+        ),
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         trailing: widget.menuItem.activo
             ? Icon(Icons.check_circle, color: colors.primary)
-            : Icon(Icons.cancel, color: Colors.red),
+            : const Icon(Icons.cancel, color: Colors.red),
         title: Text(
           '${widget.menuItem.name} ${widget.menuItem.lastName}',
           style: const TextStyle(fontWeight: FontWeight.bold),
@@ -158,12 +174,116 @@ class _CustomListTileState extends State<_CustomListTile> {
             );
 
             if (exito) {
-              // Volver a cargar la lista del padre
               await widget.onStatusChanged();
             }
           }
         },
       ),
+    );
+  }
+}
+
+class _NuevoProfesorDialog extends StatefulWidget {
+  const _NuevoProfesorDialog({required this.idPrograma});
+  final int idPrograma;
+
+  @override
+  State<_NuevoProfesorDialog> createState() => _NuevoProfesorDialogState();
+}
+
+class _NuevoProfesorDialogState extends State<_NuevoProfesorDialog> {
+  final _formKey = GlobalKey<FormState>();
+  String id = '';
+  String nombre = '';
+  String apellido = '';
+  String email = '';
+
+  final apiService = ApiService();
+  List<InfoPrograma> programas = <InfoPrograma>[];
+  Future<void> _opcionesPrograma() async {
+    programas = await apiService.getProgramas();
+    setState(() {
+      programas;
+    });
+  }
+  @override
+  void initState() {
+    _opcionesPrograma();
+    super.initState();
+  }
+  
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Crear nuevo profesor'),
+      content: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Numero de documento'),
+                onChanged: (value) => id = value,
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Campo obligatorio' : null,
+              ),
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Nombre'),
+                onChanged: (value) => nombre = value,
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Campo obligatorio' : null,
+              ),
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Apellido'),
+                onChanged: (value) => apellido = value,
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Campo obligatorio' : null,
+              ),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Correo electrónico',
+                ),
+                onChanged: (value) => email = value,
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Campo obligatorio' : null,
+              ),
+              
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            if (_formKey.currentState!.validate()) {
+              
+
+              final bool exito = await apiService.registrarUsuario(int.parse(id), nombre, apellido, email, widget.idPrograma);
+
+              // ignore: use_build_context_synchronously
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    exito
+                        ? 'Profesor creado exitosamente'
+                        : 'Error al crear profesor',
+                  ),
+                ),
+              );
+
+              // ignore: use_build_context_synchronously
+              if (exito) Navigator.pop(context, true);
+            }
+          },
+          child: const Text('Guardar'),
+        ),
+      ],
     );
   }
 }
