@@ -80,6 +80,25 @@ class ApiService {
       return [];
     }
   }
+  Future<List<InfoUsuario>> getEstudiantesPrograma(int idPrograma) async {
+    try {
+      final token = await _storage.read(key: 'token');
+      dio.options.headers['Authorization'] = 'Bearer $token';
+      final response = await dio.get('/admin/programa/estudiantes/$idPrograma');
+
+      List<InfoUsuario> estudiantes = [];
+      for (Map<String, dynamic> estudiante in response.data){
+        estudiantes.add(
+          InfoUsuario.fromJson(estudiante)
+        );
+      }
+
+
+      return estudiantes;
+    } catch (e){
+      return [];
+    }
+  }
   Future<bool> eliminarUsuario(int idUsuario) async {
     try {
       final token = await _storage.read(key: 'token');

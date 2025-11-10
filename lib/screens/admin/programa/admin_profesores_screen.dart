@@ -17,7 +17,6 @@ class AdminProfesoresScreen extends StatelessWidget {
       body: AdminProfesoresView(idPrograma: idPrograma),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Aquí abres el formulario de creación (o un diálogo, o una nueva pantalla)
           showDialog(
             context: context,
             builder: (context) => _NuevoProfesorDialog(idPrograma: idPrograma),
@@ -282,11 +281,15 @@ class _NuevoProfesorDialogState extends State<_NuevoProfesorDialog> {
               ),
               TextFormField(
                 decoration: const InputDecoration(
-                  labelText: 'Correo electrónico',
+                  labelText:
+                      'Correo electrónico: debe finalizar con @ulibre.edu.co',
                 ),
                 onChanged: (value) => email = value,
-                validator: (value) =>
-                    value == null || value.isEmpty ? 'Campo obligatorio' : null,
+                validator: (value) => value == null || value.isEmpty
+                    ? 'Campo obligatorio'
+                    : value.endsWith("@ulibre.edu.co")
+                    ? null
+                    : "Debe finalizar con @ulibre.edu.co",
               ),
             ],
           ),
@@ -450,7 +453,7 @@ class _VerAsignaturasDialogState extends State<_VerAsignaturasDialog> {
 
   Future<void> _cargarAsignaturas() async {
     try {
-      asignaturas = await apiService.getAsignaturasProfesor(widget.profesor.id, );
+      asignaturas = await apiService.getAsignaturasProfesor(widget.profesor.id);
     } catch (e) {
       asignaturas = [];
     } finally {
@@ -461,25 +464,27 @@ class _VerAsignaturasDialogState extends State<_VerAsignaturasDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Asignaturas de ${widget.profesor.name} ${widget.profesor.lastName}'),
+      title: Text(
+        'Asignaturas de ${widget.profesor.name} ${widget.profesor.lastName}',
+      ),
       content: SizedBox(
         width: 400,
         child: cargando
             ? const Center(child: CircularProgressIndicator())
             : asignaturas.isEmpty
-                ? const Text('Este profesor no tiene asignaturas asignadas.')
-                : ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: asignaturas.length,
-                    itemBuilder: (context, index) {
-                      final asig = asignaturas[index];
-                      return ListTile(
-                        title: Text(asig.nombre),
-                        subtitle: Text('Código: ${asig.codigo}'),
-                        leading: const Icon(Icons.book),
-                      );
-                    },
-                  ),
+            ? const Text('Este profesor no tiene asignaturas asignadas.')
+            : ListView.builder(
+                shrinkWrap: true,
+                itemCount: asignaturas.length,
+                itemBuilder: (context, index) {
+                  final asig = asignaturas[index];
+                  return ListTile(
+                    title: Text(asig.nombre),
+                    subtitle: Text('Código: ${asig.codigo}'),
+                    leading: const Icon(Icons.book),
+                  );
+                },
+              ),
       ),
       actions: [
         TextButton(
