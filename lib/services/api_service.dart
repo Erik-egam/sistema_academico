@@ -188,4 +188,57 @@ class ApiService {
       return false;
     }
   }
+
+  Future<bool> registrarAsignatura(String codigo, String nombre, int creditos, int idPrograma)async{
+    final token = await _storage.read(key: 'token');
+    dio.options.headers['Authorization'] = 'Bearer $token';
+
+    try {
+      final response = await dio.post('/admin/registrar/asignatura',
+      data: {
+        "codigo":codigo,
+        "nombre": nombre,
+        "creditos": creditos,
+        "id_programa": idPrograma,
+      }
+      );
+      if (response.statusCode != 201){
+        return false;
+      }
+
+      return true;
+    } catch (_){
+      return false;
+    }
+
+  }
+
+  Future<bool> habilitarAsignatura(int idAsignatura)async{
+    final token = await _storage.read(key: 'token');
+    dio.options.headers['Authorization'] = 'Bearer $token';
+    try{
+      final response = await dio.put('/admin/avilitar/asignatura/$idAsignatura');
+      if(response.statusCode != 200) return false;
+      return true;
+    }catch (_){
+      return false;
+    }
+  }
+  Future<List<InfoAsignatura>> getAsignaturasDisponibles(int idPrograma)async{
+    final token = await _storage.read(key: 'token');
+    dio.options.headers['Authorization'] = 'Bearer $token';
+    List<InfoAsignatura> asignaturas = [];
+    try{
+      final response = await dio.get('/admin/programa/asignaturas/$idPrograma/todas');
+      if(response.statusCode != 200) return [];
+      for (Map<String, dynamic> json in response.data){
+        asignaturas.add(
+          InfoAsignatura.fromJson(json)
+        );
+      }
+      return asignaturas;
+    }catch (_){
+      return [];
+    }
+  }
 }
