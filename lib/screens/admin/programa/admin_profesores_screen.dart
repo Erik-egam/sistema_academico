@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sistema_academico/models/info_asignatura.dart';
 import 'package:sistema_academico/models/info_programa.dart';
 import 'package:sistema_academico/models/info_usuario.dart';
 import 'package:sistema_academico/services/api_service.dart';
@@ -19,7 +20,7 @@ class AdminProfesoresScreen extends StatelessWidget {
           // Aquí abres el formulario de creación (o un diálogo, o una nueva pantalla)
           showDialog(
             context: context,
-            builder: (context) => _NuevoProfesorDialog(idPrograma: idPrograma,),
+            builder: (context) => _NuevoProfesorDialog(idPrograma: idPrograma),
           );
         },
         child: const Icon(Icons.add),
@@ -77,6 +78,7 @@ class _AdminProgramasViewState extends State<AdminProfesoresView> {
         itemBuilder: (context, index) {
           final profesor = profesores[index];
           return _CustomListTile(
+            idPrograma: widget.idPrograma,
             menuItem: profesor,
             onStatusChanged: _loadProgramas,
           );
@@ -90,9 +92,11 @@ class _CustomListTile extends StatefulWidget {
   const _CustomListTile({
     required this.menuItem,
     required this.onStatusChanged,
+    required this.idPrograma,
   });
 
   final InfoUsuario menuItem;
+  final int idPrograma;
   final Future<void> Function() onStatusChanged;
 
   @override
@@ -100,10 +104,11 @@ class _CustomListTile extends StatefulWidget {
 }
 
 class _CustomListTileState extends State<_CustomListTile> {
+  final ApiService apiService = ApiService();
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final ApiService apiService = ApiService();
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -120,9 +125,43 @@ class _CustomListTileState extends State<_CustomListTile> {
       ),
       child: ListTile(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        trailing: widget.menuItem.activo
-            ? Icon(Icons.check_circle, color: colors.primary)
-            : const Icon(Icons.cancel, color: Colors.red),
+        trailing: PopupMenuButton<String>(
+          icon: const Icon(Icons.more_vert),
+          onSelected: (value) async {
+            if (value == 'toggle') {
+              await _cambiarEstado(context);
+            } else if (value == 'asignar') {
+              await showDialog(
+                context: context,
+                builder: (_) => _AsignarProfesorDialog(
+                  profesor: widget.menuItem,
+                  idPrograma: widget.idPrograma,
+                ),
+              );
+            } else if (value == 'ver_asignaturas') {
+              await showDialog(
+                context: context,
+                builder: (_) =>
+                    _VerAsignaturasDialog(profesor: widget.menuItem),
+              );
+            }
+          },
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: 'toggle',
+              child: Text(widget.menuItem.activo ? 'Desactivar' : 'Activar'),
+            ),
+            const PopupMenuItem(
+              value: 'asignar',
+              child: Text('Asignar a asignatura'),
+            ),
+            const PopupMenuItem(
+              value: 'ver_asignaturas',
+              child: Text('Ver asignaturas asignadas'),
+            ),
+          ],
+        ),
+
         title: Text(
           '${widget.menuItem.name} ${widget.menuItem.lastName}',
           style: const TextStyle(fontWeight: FontWeight.bold),
@@ -130,56 +169,54 @@ class _CustomListTileState extends State<_CustomListTile> {
         subtitle: Text(
           'Email: ${widget.menuItem.email} (${widget.menuItem.activo ? "activo" : "inactivo"})',
         ),
-        onTap: () async {
-          final confirm = await showDialog<bool>(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: const Text('Confirmar acción'),
-                content: Text(
-                  '¿Estás seguro de que quieres ${widget.menuItem.activo ? 'desactivar' : 'activar'} este usuario?',
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, false),
-                    child: const Text('Cancelar'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(context, true),
-                    child: Text(
-                      'Sí, ${widget.menuItem.activo ? 'desactivar' : 'activar'}',
-                    ),
-                  ),
-                ],
-              );
-            },
-          );
-
-          if (confirm == true) {
-            final bool exito;
-            if (widget.menuItem.activo) {
-              exito = await apiService.eliminarUsuario(widget.menuItem.id);
-            } else {
-              exito = await apiService.activarUsuario(widget.menuItem.id);
-            }
-
-            // ignore: use_build_context_synchronously
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'Usuario ${widget.menuItem.activo ? 'desactivado' : 'activado'} '
-                  '${exito ? 'exitosamente' : 'fallidamente'}',
-                ),
-              ),
-            );
-
-            if (exito) {
-              await widget.onStatusChanged();
-            }
-          }
-        },
       ),
     );
+  }
+
+  Future<void> _cambiarEstado(BuildContext context) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Confirmar acción'),
+          content: Text(
+            '¿Estás seguro de que quieres ${widget.menuItem.activo ? 'desactivar' : 'activar'} este usuario?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(
+                'Sí, ${widget.menuItem.activo ? 'desactivar' : 'activar'}',
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirm == true) {
+      final bool exito = widget.menuItem.activo
+          ? await apiService.eliminarUsuario(widget.menuItem.id)
+          : await apiService.activarUsuario(widget.menuItem.id);
+
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Usuario ${widget.menuItem.activo ? 'desactivado' : 'activado'} '
+            '${exito ? 'exitosamente' : 'fallidamente'}',
+          ),
+        ),
+      );
+
+      if (exito) {
+        await widget.onStatusChanged();
+      }
+    }
   }
 }
 
@@ -206,12 +243,12 @@ class _NuevoProfesorDialogState extends State<_NuevoProfesorDialog> {
       programas;
     });
   }
+
   @override
   void initState() {
     _opcionesPrograma();
     super.initState();
   }
-  
 
   @override
   Widget build(BuildContext context) {
@@ -224,7 +261,9 @@ class _NuevoProfesorDialogState extends State<_NuevoProfesorDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextFormField(
-                decoration: const InputDecoration(labelText: 'Numero de documento'),
+                decoration: const InputDecoration(
+                  labelText: 'Numero de documento',
+                ),
                 onChanged: (value) => id = value,
                 validator: (value) =>
                     value == null || value.isEmpty ? 'Campo obligatorio' : null,
@@ -249,7 +288,6 @@ class _NuevoProfesorDialogState extends State<_NuevoProfesorDialog> {
                 validator: (value) =>
                     value == null || value.isEmpty ? 'Campo obligatorio' : null,
               ),
-              
             ],
           ),
         ),
@@ -262,9 +300,14 @@ class _NuevoProfesorDialogState extends State<_NuevoProfesorDialog> {
         ElevatedButton(
           onPressed: () async {
             if (_formKey.currentState!.validate()) {
-              
-
-              final bool exito = await apiService.registrarUsuario(int.parse(id), nombre, apellido, email, widget.idPrograma);
+              final bool exito = await apiService.registrarUsuario(
+                int.parse(id),
+                nombre,
+                apellido,
+                email,
+                widget.idPrograma,
+                "PROF",
+              );
 
               // ignore: use_build_context_synchronously
               ScaffoldMessenger.of(context).showSnackBar(
@@ -282,6 +325,166 @@ class _NuevoProfesorDialogState extends State<_NuevoProfesorDialog> {
             }
           },
           child: const Text('Guardar'),
+        ),
+      ],
+    );
+  }
+}
+
+class _AsignarProfesorDialog extends StatefulWidget {
+  const _AsignarProfesorDialog({
+    required this.profesor,
+    required this.idPrograma,
+  });
+  final InfoUsuario profesor;
+  final int idPrograma;
+  @override
+  State<_AsignarProfesorDialog> createState() => _AsignarProfesorDialogState();
+}
+
+class _AsignarProfesorDialogState extends State<_AsignarProfesorDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final ApiService apiService = ApiService();
+
+  int? _idAsignatura;
+  List<InfoAsignatura> asignaturas = [];
+  bool cargando = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarAsignaturas();
+  }
+
+  Future<void> _cargarAsignaturas() async {
+    try {
+      asignaturas = await apiService.getAsignaturas(
+        widget.idPrograma,
+      ); // <-- asegúrate de tener este método
+      setState(() {
+        asignaturas;
+        cargando = false;
+      });
+    } catch (e) {
+      setState(() => cargando = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(
+        'Asignar ${widget.profesor.name} ${widget.profesor.lastName}',
+      ),
+      content: cargando
+          ? const Center(child: CircularProgressIndicator())
+          : Form(
+              key: _formKey,
+              child: DropdownButtonFormField<int>(
+                decoration: const InputDecoration(labelText: 'Asignatura'),
+                items: asignaturas
+                    .map(
+                      (asig) => DropdownMenuItem<int>(
+                        value: asig.id,
+                        child: Text(asig.nombre),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) => _idAsignatura = value,
+                validator: (value) =>
+                    value == null ? 'Selecciona una asignatura' : null,
+              ),
+            ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            if (_formKey.currentState!.validate()) {
+              final exito = await apiService.asignarProfesorAsignatura(
+                widget.profesor.id,
+                _idAsignatura!,
+              );
+
+              // ignore: use_build_context_synchronously
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    exito
+                        ? 'Profesor asignado correctamente'
+                        : 'Error al asignar profesor',
+                  ),
+                ),
+              );
+              // ignore: use_build_context_synchronously
+              if (exito) Navigator.pop(context);
+            }
+          },
+          child: const Text('Guardar'),
+        ),
+      ],
+    );
+  }
+}
+
+class _VerAsignaturasDialog extends StatefulWidget {
+  final InfoUsuario profesor;
+  const _VerAsignaturasDialog({required this.profesor});
+
+  @override
+  State<_VerAsignaturasDialog> createState() => _VerAsignaturasDialogState();
+}
+
+class _VerAsignaturasDialogState extends State<_VerAsignaturasDialog> {
+  final ApiService apiService = ApiService();
+  bool cargando = true;
+  List<InfoAsignatura> asignaturas = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarAsignaturas();
+  }
+
+  Future<void> _cargarAsignaturas() async {
+    try {
+      asignaturas = await apiService.getAsignaturasProfesor(widget.profesor.id, );
+    } catch (e) {
+      asignaturas = [];
+    } finally {
+      setState(() => cargando = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Asignaturas de ${widget.profesor.name} ${widget.profesor.lastName}'),
+      content: SizedBox(
+        width: 400,
+        child: cargando
+            ? const Center(child: CircularProgressIndicator())
+            : asignaturas.isEmpty
+                ? const Text('Este profesor no tiene asignaturas asignadas.')
+                : ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: asignaturas.length,
+                    itemBuilder: (context, index) {
+                      final asig = asignaturas[index];
+                      return ListTile(
+                        title: Text(asig.nombre),
+                        subtitle: Text('Código: ${asig.codigo}'),
+                        leading: const Icon(Icons.book),
+                      );
+                    },
+                  ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cerrar'),
         ),
       ],
     );

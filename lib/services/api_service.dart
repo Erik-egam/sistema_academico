@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:sistema_academico/models/info_asignatura.dart';
 import 'package:sistema_academico/models/info_programa.dart';
 import 'package:sistema_academico/models/info_usuario.dart';
 
@@ -99,7 +100,7 @@ class ApiService {
       return false;
     }
   }
-  Future<bool> registrarUsuario(int id, String nombre, String apellido, String email, int idPrograma) async {
+  Future<bool> registrarUsuario(int id, String nombre, String apellido, String email, int idPrograma, String idRol) async {
     final token = await _storage.read(key: 'token');
     dio.options.headers['Authorization'] = 'Bearer $token';
     try {
@@ -110,7 +111,7 @@ class ApiService {
         "apellido": apellido,
         "email": email,
         "id_programa": idPrograma,
-        "id_rol": "PROF"
+        "id_rol": idRol
       }
       );
       if (response.statusCode != 201){
@@ -119,6 +120,52 @@ class ApiService {
 
       return true;
     } catch (_){
+      return false;
+    }
+  }
+  Future<List<InfoAsignatura>> getAsignaturas(int idPrograma)async{
+    final token = await _storage.read(key: 'token');
+    dio.options.headers['Authorization'] = 'Bearer $token';
+    List<InfoAsignatura> asignaturas = [];
+    try{
+      final response = await dio.get('/admin/programa/asignaturas/$idPrograma');
+      if(response.statusCode != 200) return [];
+      for (Map<String, dynamic> json in response.data){
+        asignaturas.add(
+          InfoAsignatura.fromJson(json)
+        );
+      }
+      return asignaturas;
+    }catch (_){
+      return [];
+    }
+  }
+  Future<List<InfoAsignatura>> getAsignaturasProfesor(int idProfesor)async{
+    final token = await _storage.read(key: 'token');
+    dio.options.headers['Authorization'] = 'Bearer $token';
+    List<InfoAsignatura> asignaturas = [];
+    try{
+      final response = await dio.get('/admin/profesor/asignaturas/$idProfesor');
+      if(response.statusCode != 200) return [];
+      for (Map<String, dynamic> json in response.data){
+        asignaturas.add(
+          InfoAsignatura.fromJson(json)
+        );
+      }
+      return asignaturas;
+    }catch (_){
+      return [];
+    }
+  }
+  Future<bool> asignarProfesorAsignatura(int idProfesor, int idAsignatura)async{
+    final token = await _storage.read(key: 'token');
+    dio.options.headers['Authorization'] = 'Bearer $token';
+    try{
+      final response = await dio.put('/admin/asignar/profesor/$idProfesor/asignatura/$idAsignatura');
+      if(response.statusCode != 202) return false;
+      
+      return true;
+    }catch (_){
       return false;
     }
   }
