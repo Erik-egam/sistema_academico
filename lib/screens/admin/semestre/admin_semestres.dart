@@ -71,7 +71,7 @@ class _CrearSemestreScreenState extends State<CrearSemestreScreen> {
       final fechaInicioStr = _formatearFecha(fechaInicio!);
       final fechaFinStr = _formatearFecha(fechaFin!);
       final nombreSemestre = _calcularNombreSemestre(fechaInicio!);
-
+      print(nombreSemestre);
       await ApiService().crearSemestre(
         fechaInicioStr,
         fechaFinStr,

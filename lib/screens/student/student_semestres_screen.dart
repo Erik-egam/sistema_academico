@@ -160,7 +160,7 @@ class _EstudianteSemestresViewState extends State<EstudianteSemestresView> {
             subtitle: Text(
               "Inicio: ${semestre.fechaInicio}  |  Fin: ${semestre.fechaFin}",
             ),
-            trailing: const Icon(Icons.arrow_forward_ios_rounded),
+            trailing: const Icon(Icons.calculate_outlined),
             onTap: () => _mostrarNotasSemestre(context, semestre.id),
           ),
         );

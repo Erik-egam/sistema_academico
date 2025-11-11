@@ -242,7 +242,7 @@ class ApiService {
     try {
       final response = await dio.post('/admin/registrar/semestre',
       data: {
-        "nombre": fechaFin,
+        "nombre": nombre,
         "fecha_inicio": fechaFin,
         "fecha_fin": fechaFin
       }
@@ -269,12 +269,42 @@ class ApiService {
       return false;
     }
   }
+
+  Future<bool> matricularAsignatura(int idAsignatura)async{
+    final token = await _storage.read(key: 'token');
+    dio.options.headers['Authorization'] = 'Bearer $token';
+    try{
+      final response = await dio.put('/estudiante/matricular/$idAsignatura');
+      if(response.statusCode != 200) return false;
+      return true;
+    }catch (_){
+      return false;
+    }
+  }
   Future<List<InfoAsignatura>> getAsignaturasDisponibles(int idPrograma)async{
     final token = await _storage.read(key: 'token');
     dio.options.headers['Authorization'] = 'Bearer $token';
     List<InfoAsignatura> asignaturas = [];
     try{
       final response = await dio.get('/admin/programa/asignaturas/$idPrograma/todas');
+      if(response.statusCode != 200) return [];
+      for (Map<String, dynamic> json in response.data){
+        asignaturas.add(
+          InfoAsignatura.fromJson(json)
+        );
+      }
+      return asignaturas;
+    }catch (_){
+      return [];
+    }
+  }
+
+  Future<List<InfoAsignatura>> getAsignaturasMatriculadas()async{
+    final token = await _storage.read(key: 'token');
+    dio.options.headers['Authorization'] = 'Bearer $token';
+    List<InfoAsignatura> asignaturas = [];
+    try{
+      final response = await dio.get('/estudiante/asignaturas/matriculadas');
       if(response.statusCode != 200) return [];
       for (Map<String, dynamic> json in response.data){
         asignaturas.add(
@@ -318,6 +348,24 @@ class ApiService {
         );
       }
       return notas;
+    }catch (_){
+      return [];
+    }
+  }
+
+  Future<List<InfoAsignatura>> getAsignaturasDisponiblesEstudiante() async {
+    final token = await _storage.read(key: 'token');
+    dio.options.headers['Authorization'] = 'Bearer $token';
+    List<InfoAsignatura> asignaturas = [];
+    try{
+      final response = await dio.get('/estudiante/asignaturas/disponibles');
+      if(response.statusCode != 200) return [];
+      for (Map<String, dynamic> json in response.data){
+        asignaturas.add(
+          InfoAsignatura.fromJson(json)
+        );
+      }
+      return asignaturas;
     }catch (_){
       return [];
     }
