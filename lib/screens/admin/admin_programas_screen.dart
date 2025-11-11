@@ -14,6 +14,15 @@ class AdminProgramasScreen extends StatelessWidget {
         title: const Text("Programas"),
       ),
       body: const AdminProgramasView(),
+
+      // Botón para crear nuevo programa
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          context.push('/admin/crear_programa');
+        },
+        icon: const Icon(Icons.add),
+        label: const Text("Crear programa"),
+      ),
     );
   }
 }
@@ -60,6 +69,7 @@ class _AdminProgramasViewState extends State<AdminProgramasView> {
     }
 
     return ListView.builder(
+      padding: const EdgeInsets.only(bottom: 200),
       itemCount: programas.length,
       itemBuilder: (context, index) {
         final programa = programas[index];

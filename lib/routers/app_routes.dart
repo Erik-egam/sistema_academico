@@ -4,6 +4,7 @@ import 'package:sistema_academico/screens/admin/admin_programa_screen.dart';
 import 'package:sistema_academico/screens/admin/admin_programas_screen.dart';
 import 'package:sistema_academico/screens/admin/admin_screen.dart';
 import 'package:sistema_academico/screens/admin/programa/admin_asignaturas_screen.dart';
+import 'package:sistema_academico/screens/admin/programa/admin_crear_programa.dart';
 import 'package:sistema_academico/screens/admin/programa/admin_estudiantes_screen.dart';
 import 'package:sistema_academico/screens/admin/programa/admin_profesores_screen.dart';
 import '../screens/login_screen.dart';
@@ -56,6 +57,13 @@ final router = GoRouter(
       builder: (context, state) {
         final infoPrograma = state.pathParameters['id'];
         return AdminAsignaturasScreen(idPrograma: int.parse(infoPrograma ?? '1'));
+      },
+    ),
+    GoRoute(
+      path: '/admin/crear_programa',
+      name: CrearProgramaScreen.name,
+      builder: (context, state) {
+        return CrearProgramaScreen();
       },
     ),
   ],
