@@ -8,6 +8,8 @@ import 'package:sistema_academico/screens/admin/programa/admin_crear_programa.da
 import 'package:sistema_academico/screens/admin/programa/admin_estudiantes_screen.dart';
 import 'package:sistema_academico/screens/admin/programa/admin_profesores_screen.dart';
 import 'package:sistema_academico/screens/admin/semestre/admin_semestres.dart';
+import 'package:sistema_academico/screens/student/student_screen.dart';
+import 'package:sistema_academico/screens/student/student_semestres_screen.dart';
 import '../screens/login_screen.dart';
 
 // GoRouter configuration
@@ -72,6 +74,20 @@ final router = GoRouter(
       name: CrearSemestreScreen.name,
       builder: (context, state) {
         return CrearSemestreScreen();
+      },
+    ),
+    GoRoute(
+      path: '/estudiante',
+      name: EstudianteScreen.name,
+      builder: (context, state) {
+        return EstudianteScreen();
+      },
+    ),
+    GoRoute(
+      path: '/estudiante/historico',
+      name: EstudianteSemestresScreen.name,
+      builder: (context, state) {
+        return EstudianteSemestresScreen();
       },
     ),
   ],

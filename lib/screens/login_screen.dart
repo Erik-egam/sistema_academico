@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sistema_academico/screens/admin/admin_screen.dart';
+import 'package:sistema_academico/screens/student/student_screen.dart';
 import 'package:sistema_academico/services/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -110,6 +111,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                 if (rol == 'ADMIN') {
                                   // ignore: use_build_context_synchronously
                                   context.goNamed(AdminScreen.name);
+                                }
+                                if (rol == 'EST') {
+                                  // ignore: use_build_context_synchronously
+                                  context.goNamed(EstudianteScreen.name);
                                 }
                               }
                             });

@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:sistema_academico/models/info_asignatura.dart';
+import 'package:sistema_academico/models/info_nota.dart';
 import 'package:sistema_academico/models/info_programa.dart';
+import 'package:sistema_academico/models/info_semestre.dart';
 import 'package:sistema_academico/models/info_usuario.dart';
 
 class ApiService {
@@ -280,6 +282,42 @@ class ApiService {
         );
       }
       return asignaturas;
+    }catch (_){
+      return [];
+    }
+  }
+
+  Future<List<InfoSemestre>> getSemestresEstudiante() async {
+    final token = await _storage.read(key: 'token');
+    dio.options.headers['Authorization'] = 'Bearer $token';
+    List<InfoSemestre> semestres = [];
+    try{
+      final response = await dio.get('/estudiante/semestres');
+      if(response.statusCode != 200) return [];
+      for (Map<String, dynamic> json in response.data){
+        semestres.add(
+          InfoSemestre.fromJson(json)
+        );
+      }
+      return semestres;
+    }catch (_){
+      return [];
+    }
+  }
+
+  Future<List<InfoNota>> getNotasPorSemestre(int idSemestre) async {
+    final token = await _storage.read(key: 'token');
+    dio.options.headers['Authorization'] = 'Bearer $token';
+    List<InfoNota> notas = [];
+    try{
+      final response = await dio.get('/estudiante/semestres/notas/$idSemestre');
+      if(response.statusCode != 200) return [];
+      for (Map<String, dynamic> json in response.data){
+        notas.add(
+          InfoNota.fromJson(json)
+        );
+      }
+      return notas;
     }catch (_){
       return [];
     }
