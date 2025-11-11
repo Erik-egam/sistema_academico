@@ -7,6 +7,7 @@ import 'package:sistema_academico/screens/admin/programa/admin_asignaturas_scree
 import 'package:sistema_academico/screens/admin/programa/admin_crear_programa.dart';
 import 'package:sistema_academico/screens/admin/programa/admin_estudiantes_screen.dart';
 import 'package:sistema_academico/screens/admin/programa/admin_profesores_screen.dart';
+import 'package:sistema_academico/screens/admin/semestre/admin_semestres.dart';
 import '../screens/login_screen.dart';
 
 // GoRouter configuration
@@ -64,6 +65,13 @@ final router = GoRouter(
       name: CrearProgramaScreen.name,
       builder: (context, state) {
         return CrearProgramaScreen();
+      },
+    ),
+    GoRoute(
+      path: '/admin/crear_semestre',
+      name: CrearSemestreScreen.name,
+      builder: (context, state) {
+        return CrearSemestreScreen();
       },
     ),
   ],

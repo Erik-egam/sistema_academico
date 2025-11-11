@@ -15,5 +15,5 @@ const appMenuItemsAdmin = <MenuItemAdmin>[
   // MenuItemAdmin(name: 'Estudiantes', subTitle: 'Administrar estudiantes', icon: Icons.school, link: '/admin/profesores'),
   MenuItemAdmin(name: 'Programas', subTitle: 'Administrar programas', icon: Icons.school, link: '/admin/programas'),
   // MenuItemAdmin(name: 'Asignaturas', subTitle: 'Administrar asignaturas', icon: Icons.school, link: '/admin/programas'),
-  MenuItemAdmin(name: 'Semestres', subTitle: 'Administrar semestres', icon: Icons.school, link: '/admin/programas'),
+  MenuItemAdmin(name: 'Crear nuevo semestre', subTitle: 'Administrar semestres', icon: Icons.school, link: '/admin/crear_semestre'),
 ];

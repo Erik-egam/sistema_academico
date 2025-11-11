@@ -233,6 +233,28 @@ class ApiService {
     }
 
   }
+  Future<bool> crearSemestre(String fechaInicio, String fechaFin, String nombre)async{
+    final token = await _storage.read(key: 'token');
+    dio.options.headers['Authorization'] = 'Bearer $token';
+
+    try {
+      final response = await dio.post('/admin/registrar/semestre',
+      data: {
+        "nombre": fechaFin,
+        "fecha_inicio": fechaFin,
+        "fecha_fin": fechaFin
+      }
+      );
+      if (response.statusCode != 201){
+        return false;
+      }
+
+      return true;
+    } catch (_){
+      return false;
+    }
+
+  }
 
   Future<bool> habilitarAsignatura(int idAsignatura)async{
     final token = await _storage.read(key: 'token');
