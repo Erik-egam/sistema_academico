@@ -3,7 +3,6 @@ class InfoUsuario {
   final String name;
   final String lastName;
   final String email;
-  // final int programa;
   final String rol;
   final bool activo;
 

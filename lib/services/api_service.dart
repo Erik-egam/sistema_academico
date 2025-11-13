@@ -398,12 +398,16 @@ class ApiService {
     }
   }
 
-  Future<List<InfoUsuario>> getEstudiantesPorAsignatura(int idAsignatura) async {
+  Future<List<InfoUsuario>> getEstudiantesPorAsignatura(
+    int idAsignatura,
+  ) async {
     final token = await _storage.read(key: 'token');
     dio.options.headers['Authorization'] = 'Bearer $token';
     List<InfoUsuario> estudiantes = [];
     try {
-      final response = await dio.get('/profesor/estudiantes/asignatura/$idAsignatura');
+      final response = await dio.get(
+        '/profesor/estudiantes/asignatura/$idAsignatura',
+      );
       if (response.statusCode != 200) return [];
       for (Map<String, dynamic> json in response.data) {
         estudiantes.add(InfoUsuario.fromJson(json));
@@ -412,5 +416,33 @@ class ApiService {
     } catch (_) {
       return [];
     }
+  }
+
+  Future<InfoNota> obtenerNotasEstudiante(
+    int idEstudiante,
+    int idAsignatura,
+  ) async {
+    final token = await _storage.read(key: 'token');
+    dio.options.headers['Authorization'] = 'Bearer $token';
+    final response = await dio.get(
+      "/profesor/notas/estudiante/$idEstudiante/asignatura/$idAsignatura",
+    );
+    return InfoNota(
+      nota1: response.data["nota1"],
+      nota2: response.data["nota2"],
+      nota3: response.data["nota3"],
+      asistencia1: response.data["asistencia1"],
+      asistencia2: response.data["asistencia2"],
+      asistencia3: response.data["asistencia3"],
+      notaFinal: response.data["nota_final"],
+    );
+  }
+
+  Future<void> asignarNotaYAsistencia(int idEstudiante, int idAsignatura, Map<String, dynamic> data) async {
+    final token = await _storage.read(key: 'token');
+    dio.options.headers['Authorization'] = 'Bearer $token';
+    await dio.post("/profesor/registar/notas/estudiante/$idEstudiante/asignatura/$idAsignatura",
+    data: data);
+
   }
 }

@@ -87,14 +87,14 @@ class _EstudianteSemestresViewState extends State<EstudianteSemestresView> {
               rows: notas.map<DataRow>((n) {
                 return DataRow(
                   cells: [
-                    DataCell(Text(n.nombre)),
+                    DataCell(Text(n.nombre!)),
                     DataCell(Text(n.nota1.toString())),
-                    DataCell(Text(n.asistencia1.toString())),
+                    DataCell(Text((n.asistencia1.toString() == "null") ? "-" : n.asistencia1.toString())),
                     DataCell(Text(n.nota2.toString())),
-                    DataCell(Text(n.asistencia2.toString())),
+                    DataCell(Text((n.asistencia2.toString() == "null") ? "-" : n.asistencia2.toString())),
                     DataCell(Text(n.nota3.toString())),
-                    DataCell(Text(n.asistencia3.toString())),
-                    DataCell(Text(n.asistencia3.toString())),
+                    DataCell(Text((n.asistencia3.toString() == "null") ? "-" : n.asistencia3.toString())),
+                    DataCell(Text((n.notaFinal.toString() == "null") ? "-" : n.notaFinal.toString())),
                   ],
                 );
               }).toList(),

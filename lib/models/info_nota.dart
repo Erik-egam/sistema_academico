@@ -1,7 +1,7 @@
 
 
 class InfoNota {
-  final String nombre;
+  final String? nombre;
   final double nota1;
   final double nota2;
   final double nota3;
@@ -11,7 +11,7 @@ class InfoNota {
   final int? asistencia3;
 
   InfoNota({
-    required this.nombre, 
+    this.nombre, 
     required this.nota1, 
     required this.nota2, 
     required this.nota3, 
