@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:sistema_academico/models/info_asignatura.dart';
 import 'package:sistema_academico/models/info_programa.dart';
 import 'package:sistema_academico/screens/admin/admin_programa_screen.dart';
 import 'package:sistema_academico/screens/admin/admin_programas_screen.dart';
@@ -11,6 +12,8 @@ import 'package:sistema_academico/screens/admin/semestre/admin_semestres.dart';
 import 'package:sistema_academico/screens/student/student_matricula_screen.dart';
 import 'package:sistema_academico/screens/student/student_screen.dart';
 import 'package:sistema_academico/screens/student/student_semestres_screen.dart';
+import 'package:sistema_academico/screens/teacher/profesor_asignatura_screen.dart';
+import 'package:sistema_academico/screens/teacher/profesor_asignaturas_screen.dart';
 import '../screens/login_screen.dart';
 
 // GoRouter configuration
@@ -96,6 +99,21 @@ final router = GoRouter(
       name: EstudianteMatriculaScreen.name,
       builder: (context, state) {
         return EstudianteMatriculaScreen();
+      },
+    ),
+    GoRoute(
+      path: '/profesor',
+      name: ProfesorAsignaturasScreen.name,
+      builder: (context, state) {
+        return ProfesorAsignaturasScreen();
+      },
+    ),
+    GoRoute(
+      path: '/profesor/detalle/asignatura',
+      name: ProfesorDetalleAsignaturaScreen.name,
+      builder: (context, state) {
+        final infoAsignatura = state.extra as InfoAsignatura;
+        return ProfesorDetalleAsignaturaScreen(infoAsignatura: infoAsignatura,);
       },
     ),
   ],

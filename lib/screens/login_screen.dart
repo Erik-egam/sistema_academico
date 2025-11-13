@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sistema_academico/screens/admin/admin_screen.dart';
 import 'package:sistema_academico/screens/student/student_screen.dart';
+import 'package:sistema_academico/screens/teacher/profesor_asignaturas_screen.dart';
 import 'package:sistema_academico/services/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -116,6 +117,19 @@ class _LoginScreenState extends State<LoginScreen> {
                                   // ignore: use_build_context_synchronously
                                   context.goNamed(EstudianteScreen.name);
                                 }
+                                if (rol == 'PROF') {
+                                  // ignore: use_build_context_synchronously
+                                  context.goNamed(ProfesorAsignaturasScreen.name);
+                                }
+                              } else {
+                                // ignore: use_build_context_synchronously
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('El correo o contraseña mal diligenciado'),
+                                    backgroundColor: Colors.red,
+                                    behavior: SnackBarBehavior.floating,
+                                  )
+                                );
                               }
                             });
                         setState(() => _isLoading = false);
