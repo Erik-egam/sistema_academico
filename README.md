@@ -3,8 +3,6 @@
 <!-- HEADER STYLE: CLASSIC -->
 <div align="center">
 
-<img src="sistema_academico.png" width="30%" style="position: relative; top: 0; right: 0;" alt="Project Logo"/>
-
 # SISTEMA_ACADEMICO
 
 <em>Empowering Education Through Seamless Digital Innovation</em>
